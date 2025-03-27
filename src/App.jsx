@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import VideoPlayer from "./VideoPlayer";
 
-const API_URL = "http://localhost:2000/api/videos"; 
+const API_URL = "http://localhost:2000/api/videos";
 const UPLOAD_URL = "http://localhost:2000/api/upload";
 
 const App = () => {
     const [videos, setVideos] = useState([]);
-    const [selectedVideo, setSelectedVideo] = useState(null);
+    const [selectedVideoId, setSelectedVideoId] = useState(null);
     const [failedThumbnails, setFailedThumbnails] = useState({});
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -49,7 +49,7 @@ const App = () => {
 
             alert("Upload successful!");
             setSelectedFile(null);
-            fetchVideos(); // Refresh video list after upload
+            fetchVideos();
         } catch (error) {
             console.error("Error uploading video:", error);
         } finally {
@@ -64,8 +64,8 @@ const App = () => {
             {/* Upload Section */}
             <div className="mb-6 flex flex-col items-center gap-3">
                 <input type="file" accept="video/*" onChange={handleFileChange} className="border p-2" />
-                <button 
-                    onClick={handleUpload} 
+                <button
+                    onClick={handleUpload}
                     disabled={uploading}
                     className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
                 >
@@ -74,10 +74,10 @@ const App = () => {
             </div>
 
             {/* Video Player */}
-            {selectedVideo && (
+            {selectedVideoId && (
                 <div className="mb-6 flex justify-center">
                     <div className="w-full max-w-lg p-3 border rounded-lg shadow-md bg-white">
-                        <VideoPlayer videoId={selectedVideo.videoId} />
+                        <VideoPlayer videoId={selectedVideoId} />
                     </div>
                 </div>
             )}
@@ -93,10 +93,10 @@ const App = () => {
                         <div
                             key={video.videoId}
                             className="cursor-pointer border rounded-lg overflow-hidden shadow-md bg-white transition-transform transform hover:scale-105 hover:shadow-xl"
-                            onClick={() => setSelectedVideo(video)}
+                            onClick={() => setSelectedVideoId(video.videoId)}
                         >
                             <img
-                                src={failedThumbnails[video.videoId] ? "/fallback-thumbnail.jpg" : video.thumbnailUrl} 
+                                src={failedThumbnails[video.videoId] ? "/fallback-thumbnail.jpg" : video.thumbnailUrl}
                                 alt="Video Thumbnail"
                                 className="w-full h-28 object-cover"
                                 onError={() =>
@@ -106,7 +106,6 @@ const App = () => {
                                     }))
                                 }
                             />
-
                             <div className="p-3">
                                 <p className="text-sm font-semibold text-gray-800 truncate">{video.videoId}</p>
                                 <p className="text-xs text-gray-500">
